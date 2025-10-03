@@ -198,7 +198,7 @@ const CartPage = () => {
           </div>
 
           <div className="border-t pt-4 mt-4 flex justify-between font-semibold text-lg">
-            <span>Total Amounts</span>
+            <span>Total Amount</span>
             <span>{(() => {
               const currencySymbol = items[0] ? getCurrencyFromProduct(items[0]).symbol : '';
               return currencySymbol + items.reduce((total, item) => {
