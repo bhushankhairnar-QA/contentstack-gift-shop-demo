@@ -257,7 +257,7 @@ const ProductsPage = () => {
       onClick={() => handleNavigation("/products")}
       className="mt-4 inline-block text-indigo-600 hover:underline cursor-pointer"
     >
-      View All Products
+      View All Products-
     </button>
   </div>
 ) : (
