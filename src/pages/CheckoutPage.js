@@ -89,7 +89,7 @@ const CheckoutPage = () => {
     }
   }, [customerInfo]);
 
-  // Redirect if cart is empty (but not if form was just submitted)
+  // Redirect if cart is empty (but not if form was just submitteds)
   useEffect(() => {
     if (items.length === 0 && !isSubmitted) {
       navigate('/cart');
