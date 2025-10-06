@@ -147,6 +147,79 @@ const CheckoutPage = () => {
   };
 
   /**
+   * Creates HTML email template for order confirmation
+   */
+  const createOrderEmailTemplate = () => {
+    const itemsList = items.map(item => {
+      const hasDiscount = item.discount_percentage && item.discount_percentage > 0;
+      const discountedPrice = hasDiscount 
+        ? Math.round(item.price - (item.discount_percentage * item.price / 100))
+        : item.price;
+      const itemTotal = discountedPrice * item.quantity;
+      
+      return `
+        <tr>
+          <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.title}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">${currencySymbol}${discountedPrice}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right; font-weight: bold;">${currencySymbol}${itemTotal}</td>
+        </tr>
+      `;
+    }).join('');
+
+    const customerFields = orderedFields.map(field => {
+      const fieldLabel = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      return `<p><strong>${fieldLabel}:</strong> ${formData[field]}</p>`;
+    }).join('');
+
+    return `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
+        <div style="background-color: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+          <h2 style="color: #2563eb; text-align: center; margin-bottom: 30px;">🎉 Order Confirmation</h2>
+          
+          <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <h3 style="color: #1e40af; margin-top: 0;">Thank you for your order!</h3>
+            <p style="color: #475569;">Your order has been successfully placed and is being processed.</p>
+            <p style="color: #64748b; font-size: 12px;">Order Date: ${new Date().toLocaleString()}</p>
+          </div>
+
+          <h3 style="color: #333; border-bottom: 2px solid #2563eb; padding-bottom: 10px;">Order Details</h3>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <thead>
+              <tr style="background-color: #f1f5f9;">
+                <th style="padding: 10px; text-align: left; color: #475569;">Product</th>
+                <th style="padding: 10px; text-align: center; color: #475569;">Qty</th>
+                <th style="padding: 10px; text-align: right; color: #475569;">Price</th>
+                <th style="padding: 10px; text-align: right; color: #475569;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsList}
+            </tbody>
+            <tfoot>
+              <tr style="background-color: #f1f5f9;">
+                <td colspan="3" style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px;">Total Amount:</td>
+                <td style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px; color:rgb(0, 0, 0);">${currencySymbol}${totalPrice}</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <h3 style="color: #333; border-bottom: 2px solid #2563eb; padding-bottom: 10px; margin-top: 30px;">Customer Information</h3>
+          <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px;">
+            ${customerFields}
+          </div>
+
+         
+        </div>
+        
+        <p style="text-align: center; color: #94a3b8; font-size: 12px; margin-top: 20px;">
+          This is an automated confirmation email. Please keep this for your records.
+        </p>
+      </div>
+    `;
+  };
+
+  /**
    * Handle form submission and order processing
    * @param {Event} e - Form submit event
    */
@@ -169,17 +242,129 @@ const CheckoutPage = () => {
     setIsSubmitting(true);
     
     try {
-      // Simulate order processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const webhookUrl = process.env.REACT_APP_EMAIL_WEBHOOK_URL;
       
-      console.log('Order processing completed, clearing cart and showing popup...');
-      clearCart();
+      console.log('🔍 DEBUG - Environment variable check:');
+      console.log('  - webhookUrl:', webhookUrl);
+      console.log('  - All env vars:', Object.keys(process.env).filter(key => key.startsWith('REACT_APP_')));
+      
+      if (!webhookUrl) {
+        console.error('❌ Email webhook URL not configured in environment variables');
+        console.error('❌ Make sure .env file has: REACT_APP_EMAIL_WEBHOOK_URL=...');
+        console.error('❌ And restart the dev server with: npm start');
+      } else {
+        console.log('✅ Webhook URL found:', webhookUrl);
+        
+        // Get customer email - search for any field containing "email"
+        let customerEmail = '';
+        const emailFieldKey = Object.keys(formData).find(key => 
+          key.toLowerCase().includes('email')
+        );
+        
+        if (emailFieldKey) {
+          customerEmail = formData[emailFieldKey];
+        }
+        
+        // Get customer name - search for any field containing "name"
+        let customerName = 'Customer';
+        const nameFieldKey = Object.keys(formData).find(key => 
+          key.toLowerCase().includes('name') && !key.toLowerCase().includes('email')
+        );
+        
+        if (nameFieldKey) {
+          customerName = formData[nameFieldKey];
+        }
+        
+        console.log('🔍 DEBUG - Email field check:');
+        console.log('  - All form fields:', Object.keys(formData));
+        console.log('  - Email field found:', emailFieldKey);
+        console.log('  - Email value:', customerEmail);
+        console.log('  - Name field found:', nameFieldKey);
+        console.log('  - Name value:', customerName);
+        
+        if (!customerEmail) {
+          console.warn('⚠️ No email field found in form data!');
+          console.warn('Available form fields:', Object.keys(formData));
+        } else {
+          console.log('✅ Customer email found:', customerEmail);
+          
+          try {
+            // Create HTML email template
+            const emailHTML = createOrderEmailTemplate();
+            console.log('📧 Email HTML length:', emailHTML.length, 'characters');
+            
+            // Create query parameters - matching Contentstack automation API structure
+            const params = new URLSearchParams({
+              to: customerEmail,
+              subject: `Order Confirmation - ${itemCount} Item(s) - ${currencySymbol}${totalPrice}`,
+              body: emailHTML
+            });
+            
+            // Build URL with query parameters
+            const url = `${webhookUrl}?${params.toString()}`;
+            
+            console.log('📤 Sending email...');
+            console.log('  - To:', customerEmail);
+            console.log('  - Subject:', `Order Confirmation - ${itemCount} Item(s) - ${currencySymbol}${totalPrice}`);
+            console.log('  - URL (first 150 chars):', url.substring(0, 150) + '...');
+            
+            // Send POST request to Contentstack automation API with timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+            
+            const response = await fetch(url, {
+              method: 'POST',
+              signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            console.log('📥 Response received:');
+            console.log('  - Status:', response.status);
+            console.log('  - Status Text:', response.statusText);
+            console.log('  - OK:', response.ok);
+            
+            if (response.ok) {
+              const responseData = await response.json();
+              console.log('✅ ✅ ✅ EMAIL SENT SUCCESSFULLY! ✅ ✅ ✅');
+              console.log('Response data:', responseData);
+              console.log('  - Trigger ID:', responseData.trigger_id);
+              console.log('  - Payload ID:', responseData.payload_id);
+              console.log('  - Execution IDs:', responseData.execution_ids);
+            } else {
+              console.error('❌ Email webhook responded with error:', response.status);
+              const errorText = await response.text();
+              console.error('Error response:', errorText);
+            }
+          } catch (fetchError) {
+            console.error('❌ Email fetch error (non-critical):', fetchError);
+            if (fetchError.name === 'AbortError') {
+              console.error('Email request timed out after 10 seconds');
+            }
+            // Don't throw - allow order completion to continue
+          }
+        }
+      }
+      
+      // Always complete the order and show popup (regardless of email status)
+      console.log('Order processing completed, showing popup first...');
       setIsSubmitting(false);
       setIsSubmitted(true);
       console.log('Popup state set to true, should be visible now');
       
+      // Clear cart after a short delay to ensure popup renders first
+      setTimeout(() => {
+        console.log('Clearing cart now...');
+        clearCart();
+      }, 1500);
+      
     } catch (error) {
-      console.error('Error processing order:', error);
+      console.error('❌ Error processing order:', error);
+      console.error('Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
       setIsSubmitting(false);
       alert(customerInfo?.error_message || 'There was an error processing your order. Please try again.');
     }
@@ -414,21 +599,21 @@ const CheckoutPage = () => {
                       {orderedFields.map(renderFormField)}
                     </div>
                     
-                    {/* Debug Button */}
+                    {/* Place Order Button */}
                     <div className="mt-8 flex justify-center">
                       <button
-                        type="button"
-                        onClick={() => {
-                          console.log('=== DEBUG BUTTON CLICKED ===');
-                          console.log('Current form data:', formData);
-                          console.log('Current isSubmitted state:', isSubmitted);
-                          console.log('Setting isSubmitted to true...');
-                          setIsSubmitted(true);
-                          console.log('isSubmitted should now be true');
-                        }}
-                        className="w-1/3 bg-blue-400 hover:bg-blue-500 text-white py-4 px-4 rounded-xl font-bold text-lg transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-1/3 bg-blue-600 hover:bg-blue-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                       >
-                        Place Order
+                        {isSubmitting ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                            <span>Processing...</span>
+                          </div>
+                        ) : (
+                          'Place Order'
+                        )}
                       </button>
                     </div>
                   </div>
