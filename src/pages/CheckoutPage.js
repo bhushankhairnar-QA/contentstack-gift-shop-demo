@@ -414,21 +414,21 @@ const CheckoutPage = () => {
                       {orderedFields.map(renderFormField)}
                     </div>
                     
-                    {/* Debug Button */}
+                    {/* Submit Button */}
                     <div className="mt-8 flex justify-center">
                       <button
-                        type="button"
-                        onClick={() => {
-                          console.log('=== DEBUG BUTTON CLICKED ===');
-                          console.log('Current form data:', formData);
-                          console.log('Current isSubmitted state:', isSubmitted);
-                          console.log('Setting isSubmitted to true...');
-                          setIsSubmitted(true);
-                          console.log('isSubmitted should now be true');
-                        }}
-                        className="w-1/3 bg-blue-400 hover:bg-blue-500 text-white py-4 px-4 rounded-xl font-bold text-lg transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-1/3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 px-4 rounded-xl font-bold text-lg transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                       >
-                        Place Order
+                        {isSubmitting ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                            <span>Processing...</span>
+                          </div>
+                        ) : (
+                          customerInfo?.place_order || 'Place Order'
+                        )}
                       </button>
                     </div>
                   </div>
