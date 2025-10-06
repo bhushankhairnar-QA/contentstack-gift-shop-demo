@@ -187,10 +187,10 @@ const CheckoutPage = () => {
           <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <thead>
               <tr style="background-color: #f1f5f9;">
-                <th style="padding: 10px; text-align: left; color: #475569;">Product</th>
-                <th style="padding: 10px; text-align: center; color: #475569;">Qty</th>
-                <th style="padding: 10px; text-align: right; color: #475569;">Price</th>
-                <th style="padding: 10px; text-align: right; color: #475569;">Total</th>
+                <th style="padding: 10px; text-align: left; color: #000000;">Product</th>
+                <th style="padding: 10px; text-align: center; color: #000000;">Qty</th>
+                <th style="padding: 10px; text-align: right; color: #000000;">Price</th>
+                <th style="padding: 10px; text-align: right; color: #000000;">Total</th>
               </tr>
             </thead>
             <tbody>
@@ -198,8 +198,8 @@ const CheckoutPage = () => {
             </tbody>
             <tfoot>
               <tr style="background-color: #f1f5f9;">
-                <td colspan="3" style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px;">Total Amount:</td>
-                <td style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px; color:rgb(0, 0, 0);">${currencySymbol}${totalPrice}</td>
+                <td colspan="3" style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px; color: #000000;">Total Amount:</td>
+                <td style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px; color: #000000;">${currencySymbol}${totalPrice}</td>
               </tr>
             </tfoot>
           </table>
