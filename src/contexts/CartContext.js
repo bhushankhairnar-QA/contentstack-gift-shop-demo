@@ -9,7 +9,9 @@ const CART_ACTIONS = {
   REMOVE_ITEM: 'REMOVE_ITEM',
   UPDATE_QUANTITY: 'UPDATE_QUANTITY',
   CLEAR_CART: 'CLEAR_CART',
-  LOAD_CART: 'LOAD_CART'
+  LOAD_CART: 'LOAD_CART',
+  SHOW_TOAST: 'SHOW_TOAST',
+  HIDE_TOAST: 'HIDE_TOAST'
 };
 
 // Cart Reducer
@@ -69,6 +71,26 @@ const cartReducer = (state, action) => {
         items: []
       };
 
+    case CART_ACTIONS.SHOW_TOAST:
+      return {
+        ...state,
+        toast: {
+          show: true,
+          message: action.payload.message,
+          productName: action.payload.productName
+        }
+      };
+
+    case CART_ACTIONS.HIDE_TOAST:
+      return {
+        ...state,
+        toast: {
+          show: false,
+          message: '',
+          productName: ''
+        }
+      };
+
     default:
       return state;
   }
@@ -77,7 +99,12 @@ const cartReducer = (state, action) => {
 // Initial Cart State
 const initialState = {
   items: [],
-  isLoading: false
+  isLoading: false,
+  toast: {
+    show: false,
+    message: '',
+    productName: ''
+  }
 };
 
 // Cart Provider Component
@@ -108,7 +135,26 @@ export const CartProvider = ({ children }) => {
 
   // Cart Actions
   const addToCart = (product) => {
+    const existingItem = state.items.find(item => item.uid === product.uid);
     dispatch({ type: CART_ACTIONS.ADD_ITEM, payload: product });
+    
+    // Show toast notification with appropriate message
+    const message = existingItem 
+      ? 'Quantity updated in your cart' 
+      : 'Product added to your cart';
+    
+    dispatch({ 
+      type: CART_ACTIONS.SHOW_TOAST, 
+      payload: { 
+        message: message,
+        productName: product.title || 'Product'
+      } 
+    });
+    
+    // Auto-hide toast after 3 seconds
+    setTimeout(() => {
+      dispatch({ type: CART_ACTIONS.HIDE_TOAST });
+    }, 3000);
   };
 
   const removeFromCart = (productUid) => {
@@ -124,6 +170,10 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => {
     dispatch({ type: CART_ACTIONS.CLEAR_CART });
+  };
+
+  const hideToast = () => {
+    dispatch({ type: CART_ACTIONS.HIDE_TOAST });
   };
 
   // Computed values
@@ -143,6 +193,7 @@ export const CartProvider = ({ children }) => {
     removeFromCart,
     updateQuantity,
     clearCart,
+    hideToast,
     itemCount,
     totalPrice
   };
@@ -150,6 +201,76 @@ export const CartProvider = ({ children }) => {
   return (
     <CartContext.Provider value={value}>
       {children}
+      
+      {/* Toast Notification */}
+      {state.toast.show && (
+        <div 
+          className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 animate-slideUp"
+          style={{
+            animation: 'slideUp 0.3s ease-out'
+          }}
+        >
+          <div className="bg-green-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 min-w-[320px] max-w-md">
+            {/* Success Icon */}
+            <div className="flex-shrink-0">
+              <svg 
+                className="w-6 h-6" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" 
+                />
+              </svg>
+            </div>
+            
+            {/* Message */}
+            <div className="flex-1">
+              <p className="font-semibold text-sm">{state.toast.message}</p>
+              <p className="text-xs text-green-100 mt-0.5">"{state.toast.productName}"</p>
+            </div>
+            
+            {/* Close Button */}
+            <button
+              onClick={hideToast}
+              className="flex-shrink-0 text-white hover:text-green-200 transition-colors"
+              aria-label="Close notification"
+            >
+              <svg 
+                className="w-5 h-5" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M6 18L18 6M6 6l12 12" 
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Toast Animation Styles */}
+      <style jsx>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+        }
+      `}</style>
     </CartContext.Provider>
   );
 };
