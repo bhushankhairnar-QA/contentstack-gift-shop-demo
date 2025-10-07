@@ -381,7 +381,7 @@ const CheckoutPage = () => {
     navigate(customerInfo?.redirect_url || '/');
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 100);
+    }, 1000);
   };
 
   // Handle escape key and prevent body scroll when modal is open

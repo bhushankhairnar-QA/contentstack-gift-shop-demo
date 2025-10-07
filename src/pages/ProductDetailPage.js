@@ -20,6 +20,13 @@ const ProductDetailPage = () => {
     }
   };
 
+  const handleBuyNow = () => {
+    if (product) {
+      addToCart(product);
+      navigate('/checkout');
+    }
+  };
+
   const handleWishlistToggle = () => {
     if (product) {
       toggleWishlist(product);
@@ -145,7 +152,7 @@ const ProductDetailPage = () => {
                 </button>
                 
                 <button
-                  onClick={() => navigate('/checkout')}
+                  onClick={handleBuyNow}
                   className="flex-1 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded font-semibold transition-colors shadow-md"
                   disabled={product.stock_status === 'out_of_stock'}
                 >
