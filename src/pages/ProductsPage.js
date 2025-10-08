@@ -12,6 +12,7 @@ import {
 import { FiHeart, FiChevronDown, FiChevronUp, FiSearch } from "react-icons/fi";
 import StarRating from "../components/StarRating";
 import { type } from "@testing-library/user-event/dist/type";
+import personalizeSdk from "../services/personalize";
 
 const ProductsPage = () => {
   const { data: products, loading, error } = useContentstack("products");
@@ -158,9 +159,38 @@ const ProductsPage = () => {
                     {categories?.map((c) => (
                       <li key={c.uid}>
                         <button
-                          onClick={() => {
+                          onClick={async () => {
                             setCategory(c.uid);
                             setCategoryOpen(false);
+                            
+                            // Call personalize SDK when Birthday Gifts is selected
+                            const categoryName = c.name || c.title;
+                            if (categoryName === "Birthday Gifts") {
+                              await personalizeSdk.set({
+                                "category": "Birthday Gifts"
+                              });
+                              
+                              // Log active experiences
+                              const experiences = personalizeSdk.getExperiences();
+                              console.log("Active Experiences:", experiences);
+                            }
+                            if (categoryName === "Wedding Gifts") {
+                              await personalizeSdk.set({
+                                "category": "Wedding Gifts"
+                              });
+                              
+                              // Log active experiences
+                              const experiences = personalizeSdk.getExperiences();
+                              console.log("Active Experiences:", experiences);
+                            }if (categoryName === "Holiday Gifts") {
+                              await personalizeSdk.set({
+                                "category": "Holiday Gifts"
+                              });
+                              
+                              // Log active experiences
+                              const experiences = personalizeSdk.getExperiences();
+                              console.log("Active Experiences:", experiences);
+                            }
                           }}
                           className={`w-full text-left px-4 py-2 hover:bg-indigo-50 ${
                             category === c.uid
