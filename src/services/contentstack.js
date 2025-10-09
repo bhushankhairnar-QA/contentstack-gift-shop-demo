@@ -352,4 +352,3 @@ class ContentstackService {
 // Create and export a single instance
 const contentstackService = new ContentstackService();
 export default contentstackService;
-
