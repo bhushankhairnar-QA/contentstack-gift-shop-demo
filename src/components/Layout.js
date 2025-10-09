@@ -319,7 +319,7 @@ const Layout = ({ children }) => {
           <div className="flex items-center justify-between h-20">
             {/* LOGO */}
             <button 
-              onClick={() => handleNavigation("/")} 
+              onClick={() => window.location.href = "/"} 
               className="flex items-center space-x-3 cursor-pointer group transition-all duration-200 hover:opacity-90"
             >
               {(() => {
@@ -374,7 +374,7 @@ const Layout = ({ children }) => {
               {navLinks.map((link) => (
                 <button
                   key={link.to}
-                  onClick={() => handleNavigation(link.to)}
+                  onClick={() => link.to === "/" ? (window.location.href = "/") : handleNavigation(link.to)}
                   className="text-gray-700 font-medium hover:text-indigo-600 transition-colors cursor-pointer"
                 >
                   {link.label}
@@ -382,7 +382,7 @@ const Layout = ({ children }) => {
               ))}
 
               {/* Categories Dropdown */}
-              <div className="relative group">
+              {/* <div className="relative group">
                 <button className="flex items-center space-x-1 font-medium text-gray-700 hover:text-indigo-600">
                   <span>Categories</span>
                   <FiChevronDown className="w-4 h-4" />
@@ -401,7 +401,7 @@ const Layout = ({ children }) => {
                     ))}
                   </ul>
                 </div>
-              </div>
+              </div> */}
             </nav>
 
             {/* SEARCH BAR (desktop) */}
@@ -482,8 +482,12 @@ const Layout = ({ children }) => {
                 <button
                   key={link.to}
                   onClick={() => {
-                    handleNavigation(link.to);
-                    setShowMobileMenu(false);
+                    if (link.to === "/") {
+                      window.location.href = "/";
+                    } else {
+                      handleNavigation(link.to);
+                      setShowMobileMenu(false);
+                    }
                   }}
                   className="block w-full text-left px-3 py-2 rounded-md text-gray-700 hover:bg-indigo-50"
                 >
