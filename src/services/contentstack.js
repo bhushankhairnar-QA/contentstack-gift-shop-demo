@@ -1,4 +1,6 @@
 import Contentstack from 'contentstack';
+import Personalize from '@contentstack/personalize-edge-sdk';
+import { getPersonalizeInstance } from './personalize-context';
 
 // Initialize Contentstack
 const Stack = Contentstack.Stack({
@@ -165,8 +167,18 @@ class ContentstackService {
 
   // Fetch homepage content
   async getHomepageContent() {
+    let variantAliases = [];
     try {
-      const Query = Stack.ContentType('homepage').Query();
+      const sdk = await getPersonalizeInstance();
+      if (sdk && typeof sdk.getExperiences === 'function') {
+        const experiences = sdk.getExperiences();
+        console.log('Personalized Experiences:', experiences);
+        variantAliases = sdk.getVariantAliases();
+        console.log('Personalized Variant Aliases:', variantAliases);
+      } else {
+        console.warn('Personalize SDK not available or getExperiences method not found');
+      }
+      const Query = Stack.ContentType('homepage').Query().variants(variantAliases);
       
       // Include all possible image field references for homepage
       const imageFields = [
@@ -181,7 +193,9 @@ class ContentstackService {
         }
       });
       
+      // Include featured and recommended products with nested references
       Query.includeReference('featured_products');
+      Query.includeReference('recommended_products');  // ← This line is missing!
       const result = await Query.toJSON().find();
       
       // Debug logging for homepage content

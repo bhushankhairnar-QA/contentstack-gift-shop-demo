@@ -12,9 +12,11 @@ import WishlistPage from './pages/WishlistPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import { PersonalizeProvider } from './services/personalize-context';
 
 function App() {
   return (
+    <PersonalizeProvider>
     <CartProvider>
       <WishlistProvider>
         <Router>
@@ -35,6 +37,7 @@ function App() {
         </Router>
       </WishlistProvider>
     </CartProvider>
+    </PersonalizeProvider>
   );
 }
 
