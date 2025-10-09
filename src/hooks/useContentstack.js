@@ -110,6 +110,3 @@ export const useProductsByCategory = (categoryId) => {
 
   return { products, loading, error };
 };
-
-
-
