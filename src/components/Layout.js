@@ -131,6 +131,16 @@ const Layout = ({ children }) => {
 
   // Handle navigation with scroll to top
   const handleNavigation = (path) => {
+    // Check if personalization refresh is needed when navigating to home
+    if (path === '/' && sessionStorage.getItem('personalizeRefresh') === 'true') {
+      // Clear the flag
+      sessionStorage.removeItem('personalizeRefresh');
+      // Perform hard refresh to home page
+      window.location.href = '/';
+      return;
+    }
+    
+    // Normal navigation for other cases
     navigate(path);
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -319,7 +329,7 @@ const Layout = ({ children }) => {
           <div className="flex items-center justify-between h-20">
             {/* LOGO */}
             <button 
-              onClick={() => window.location.href = "/"} 
+              onClick={() => handleNavigation("/")} 
               className="flex items-center space-x-3 cursor-pointer group transition-all duration-200 hover:opacity-90"
             >
               {(() => {
@@ -374,7 +384,7 @@ const Layout = ({ children }) => {
               {navLinks.map((link) => (
                 <button
                   key={link.to}
-                  onClick={() => link.to === "/" ? (window.location.href = "/") : handleNavigation(link.to)}
+                  onClick={() => handleNavigation(link.to)}
                   className="text-gray-700 font-medium hover:text-indigo-600 transition-colors cursor-pointer"
                 >
                   {link.label}
@@ -463,12 +473,8 @@ const Layout = ({ children }) => {
                 <button
                   key={link.to}
                   onClick={() => {
-                    if (link.to === "/") {
-                      window.location.href = "/";
-                    } else {
-                      handleNavigation(link.to);
-                      setShowMobileMenu(false);
-                    }
+                    handleNavigation(link.to);
+                    setShowMobileMenu(false);
                   }}
                   className="block w-full text-left px-3 py-2 rounded-md text-gray-700 hover:bg-indigo-50"
                 >

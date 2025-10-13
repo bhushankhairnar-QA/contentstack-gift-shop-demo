@@ -169,8 +169,12 @@ const ProductsPage = () => {
                               await personalizeSdk.set({
                                 "category": "Birthday Gifts"
                               });
-                              
+                              // window.jstag.send({
+                              //   "category": "Birthday Gifts"
+                              // });
+                          
                               // Log active experiences
+                              sessionStorage.setItem('personalizeRefresh', 'true');
                               const experiences = personalizeSdk.getExperiences();
                               console.log("Active Experiences:", experiences);
                             }
@@ -179,15 +183,23 @@ const ProductsPage = () => {
                                 "category": "Wedding Gifts"
                               });
                               
+                           
+                           
+                    
                               // Log active experiences
+                              sessionStorage.setItem('personalizeRefresh', 'true');
                               const experiences = personalizeSdk.getExperiences();
                               console.log("Active Experiences:", experiences);
                             }if (categoryName === "Holiday Gifts") {
                               await personalizeSdk.set({
                                 "category": "Holiday Gifts"
-                              });
+                              }); 
+                              
+                        
+                              
                               
                               // Log active experiences
+                              sessionStorage.setItem('personalizeRefresh', 'true');
                               const experiences = personalizeSdk.getExperiences();
                               console.log("Active Experiences:", experiences);
                             }
