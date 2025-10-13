@@ -182,7 +182,9 @@ const ProductsPage = () => {
                               await personalizeSdk.set({
                                 "category": "Wedding Gifts"
                               });
-                              
+                              // window.jstag.send({
+                              //   "category": "Wedding Gifts"
+                              // });
                            
                            
                     
@@ -194,7 +196,9 @@ const ProductsPage = () => {
                               await personalizeSdk.set({
                                 "category": "Holiday Gifts"
                               }); 
-                              
+                              // window.jstag.send({
+                              //   "category": "Holiday Gifts"
+                              // });
                         
                               
                               
