@@ -13,9 +13,11 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import { PersonalizeProvider } from './services/personalize-context';
+import LyticsProvider from './services/LyticsProviders.jsx';
 
 function App() {
   return (
+    <LyticsProvider>
     <PersonalizeProvider>
     <CartProvider>
       <WishlistProvider>
@@ -38,6 +40,7 @@ function App() {
       </WishlistProvider>
     </CartProvider>
     </PersonalizeProvider>
+    </LyticsProvider>
   );
 }
 

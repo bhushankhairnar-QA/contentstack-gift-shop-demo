@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import ContentstackService from '../services/contentstack';
 
-// Custom hook for fetching Contentstack data
 export const useContentstack = (contentType, dependencies = []) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,7 +11,7 @@ export const useContentstack = (contentType, dependencies = []) => {
       try {
         setLoading(true);
         setError(null);
-        
+
         let result;
         switch (contentType) {
           case 'products':
@@ -36,7 +35,7 @@ export const useContentstack = (contentType, dependencies = []) => {
           default:
             throw new Error(`Unknown content type: ${contentType}`);
         }
-        
+
         setData(result);
       } catch (err) {
         setError(err.message);
@@ -53,7 +52,6 @@ export const useContentstack = (contentType, dependencies = []) => {
   return { data, loading, error };
 };
 
-// Hook for fetching a single product
 export const useProduct = (uid) => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -82,7 +80,6 @@ export const useProduct = (uid) => {
   return { product, loading, error };
 };
 
-// Hook for fetching products by category
 export const useProductsByCategory = (categoryId) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);

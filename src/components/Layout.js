@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
 import { useWishlist } from "../contexts/WishlistContext";
 import { useContentstack } from "../hooks/useContentstack";
@@ -30,6 +30,14 @@ const Layout = ({ children }) => {
   const { data: contactData } = useContentstack("contact");
   const { data: homepageData } = useContentstack("homepage");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Track page views on every route change for SPA navigation
+  useEffect(() => {
+    if (window.jstag) {
+      window.jstag.pageView();
+    }
+  }, [location.pathname]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showMobileMenu, setShowMobileMenu] = useState(false);

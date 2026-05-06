@@ -163,49 +163,17 @@ const ProductsPage = () => {
                             setCategory(c.uid);
                             setCategoryOpen(false);
                             
-                            // Call personalize SDK when Birthday Gifts is selected
                             const categoryName = c.name || c.title;
-                            if (categoryName === "Birthday Gifts") {
-                              await personalizeSdk.set({
-                                "category": "Birthday Gifts"
-                              });
-                              // window.jstag.send({
-                              //   "category": "Birthday Gifts"
-                              // });
-                          
-                              // Log active experiences
+                            const trackedCategories = ["Birthday Gifts", "Wedding Gifts", "Holiday Gifts"];
+                            if (trackedCategories.includes(categoryName)) {
+                              await personalizeSdk.set({ category: categoryName });
+
+                              if (window.jstag) {
+                                window.jstag.send({ category: categoryName });
+                              }
+
                               sessionStorage.setItem('personalizeRefresh', 'true');
-                              const experiences = personalizeSdk.getExperiences();
-                              console.log("Active Experiences:", experiences);
-                            }
-                            if (categoryName === "Wedding Gifts") {
-                              await personalizeSdk.set({
-                                "category": "Wedding Gifts"
-                              });
-                              // window.jstag.send({
-                              //   "category": "Wedding Gifts"
-                              // });
-                           
-                           
-                    
-                              // Log active experiences
-                              sessionStorage.setItem('personalizeRefresh', 'true');
-                              const experiences = personalizeSdk.getExperiences();
-                              console.log("Active Experiences:", experiences);
-                            }if (categoryName === "Holiday Gifts") {
-                              await personalizeSdk.set({
-                                "category": "Holiday Gifts"
-                              }); 
-                              // window.jstag.send({
-                              //   "category": "Holiday Gifts"
-                              // });
-                        
-                              
-                              
-                              // Log active experiences
-                              sessionStorage.setItem('personalizeRefresh', 'true');
-                              const experiences = personalizeSdk.getExperiences();
-                              console.log("Active Experiences:", experiences);
+                              console.log("Active Experiences:", personalizeSdk.getExperiences());
                             }
                           }}
                           className={`w-full text-left px-4 py-2 hover:bg-indigo-50 ${

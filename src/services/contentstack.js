@@ -1,12 +1,11 @@
 import Contentstack from 'contentstack';
-import Personalize from '@contentstack/personalize-edge-sdk';
 import { getPersonalizeInstance } from './personalize-context';
 
-// Initialize Contentstack
+// Initialize Contentstack Stack
 const Stack = Contentstack.Stack({
   api_key: process.env.REACT_APP_CONTENTSTACK_API_KEY,
   delivery_token: process.env.REACT_APP_CONTENTSTACK_DELIVERY_TOKEN,
-  environment: process.env.REACT_APP_CONTENTSTACK_ENVIRONMENT || 'dev'
+  environment: process.env.REACT_APP_CONTENTSTACK_ENVIRONMENT || 'dev',
 });
 
 // Service class for Contentstack operations
